@@ -2,7 +2,7 @@
 
 import boto3
 import logging
-
+from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +21,18 @@ class Visitor:
         Increases the visitor counter by one.
         """
         try:
+            current_value = self.table.get_item(Key={'id': 'visitor_count'})
+            value = current_value['Item']['value'] + 1
             response = self.table.put_item(Item={'id': 'visitor_count',
-                                                 'value': 1})
-            print(response)
-        except Exception as e:
+                                                 'value': value})
+            print("Wrote " + str(value) + " to the db.")
+        except ClientError as e:
             logger.error(
                     "Failed due to %s: %s",
                     e.response['Error']['Code'],
                     e.response['Error']['Message'])
+        except Exception as e:
+            print(e)
 
 
 def main():
