@@ -1,8 +1,8 @@
-#!/usr/bin/python3
-
+import json
 import boto3
 import logging
 from botocore.exceptions import ClientError
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class Visitor:
             value = current_value['Item']['value'] + 1
             response = self.table.put_item(Item={'id': 'visitor_count',
                                                  'value': value})
-            print("Wrote " + str(value) + " to the db.")
+            return "Wrote " + str(value) + " to the db."
         except ClientError as e:
             logger.error(
                     "Failed due to %s: %s",
@@ -35,11 +35,12 @@ class Visitor:
             print(e)
 
 
-def main():
+def lambda_handler(event, context):
     dyn_resource = boto3.resource('dynamodb')
     counter = Visitor(dyn_resource)
-    counter.add_visitor()
+    response = counter.add_visitor()
+    return {
+        'statusCode': 200,
+        'body': json.dumps(response)
+    }
 
-
-if '__main__' in __name__:
-    main()
