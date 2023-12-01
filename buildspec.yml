@@ -1,6 +1,15 @@
-build:
-  commands:
-    - zip visitor-counter.zip visitor-counter.py
-    - aws s3 cp visitor-counter.zip s3://org-lambda-bucket
-    - wait
-    - aws lambda update-function-code --function-name visitor_counter --s3-bucket org-lambda-bucket --s3-key visitor-counter.zip
+version 0.2
+phases:
+  pre-build:
+    commands:
+      - echo Starting pre-build
+  build:
+    commands:
+      - echo build started on `date`
+      - zip visitor-counter.zip visitor-counter.py
+      - aws s3 cp visitor-counter.zip s3://org-lambda-bucket
+      - wait
+      - aws lambda update-function-code --function-name visitor_counter --s3-bucket org-lambda-bucket --s3-key visitor-counter.zip
+  post-build:
+    commands:
+      - echo starting post-build
