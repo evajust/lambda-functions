@@ -1,3 +1,4 @@
+'''Version 0.1'''
 import json
 import boto3
 import logging
