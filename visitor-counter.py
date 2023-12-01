@@ -15,7 +15,6 @@ class Visitor:
         self.dyn_resource = dyn_resource
         self.table = self.dyn_resource.Table('test1')
 
-
     def add_visitor(self):
         """
         Increases the visitor counter by one.
@@ -23,9 +22,8 @@ class Visitor:
         try:
             current_value = self.table.get_item(Key={'id': 'visitor_count'})
             value = current_value['Item']['value'] + 1
-            response = self.table.put_item(Item={'id': 'visitor_count',
-                                                 'value': value})
-            return "Wrote " + str(value) + " to the db."
+            return self.table.put_item(Item={'id': 'visitor_count',
+                                             'value': value})
         except ClientError as e:
             logger.error(
                     "Failed due to %s: %s",
@@ -43,4 +41,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps(response)
     }
-
