@@ -13,3 +13,7 @@ phases:
   post-build:
     commands:
       - echo starting post-build
+      - echo build complete > artifact.txt
+artifacts:
+  files: artifact.txt
+
