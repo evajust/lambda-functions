@@ -1,22 +1,33 @@
 #!/usr/bin/env python3
 
 import boto3
-import sys
 from datetime import datetime
-import json
 import logging
 
 
 logger = logging.getLogger(__name__)
 
 
+def notify_success(event):
+    client = boto3.client('codepipeline')
+    client.put_job_success_result(jobId=event['CodePipeline.job']['id'])
+
+
+def notify_failure(event):
+    client = boto3.client('codepipeline')
+    failure_details = {
+            'type': 'ConfigurationError',
+            'message': 'URL not found'}
+    client.put_job_filure_result(jobId=event['CodePipeline.job']['id'],
+                                 failureDetails=failure_details)
+
+
 def lambda_handler(event, context):
     client = boto3.client('cloudfront')
 
     print("event: " + str(event))
-    print("context: " + str(context))
     caller_reference = datetime.now().strftime('%Y%m%d%H%M%S%f')
-    url = sys.argv[1]
+    url = event['CodePipeline.job']['data']['actionConfiguration']['configuration']['UserParameters']
     invalidation_path = {'Paths': {
                              'Quantity': 1,
                              'Items': ['/*']
@@ -28,10 +39,9 @@ def lambda_handler(event, context):
     distribution_list = response['DistributionList']['Items']
     for distribution in distribution_list:
         if url in distribution['Aliases']['Items']:
-            response = client.create_invalidation(
+            client.create_invalidation(
                     DistributionId=distribution['Id'],
                     InvalidationBatch=invalidation_path)
-            return {
-                'statusCode': 200,
-                'body': json.dumps(response)
-            }
+            notify_success(event)
+
+
