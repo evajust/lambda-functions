@@ -12,7 +12,7 @@ def push_lambda_files(file):
     in_mem_archive = BytesIO()
     with ZipFile(in_mem_archive, 'w') as zip_archive:
         with open(file, 'rb') as f:
-            zip_archive.writestr(file.name, f.read())
+            zip_archive.writestr('lambda_function.py', f.read())
 
     client = boto3.client('lambda')
     client.update_function_code(FunctionName=function_name,

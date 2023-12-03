@@ -25,7 +25,7 @@ class Visitor:
             value = current_value['Item']['value'] + 1
             self.table.put_item(Item={'id': 'visitor_count',
                                             'value': value})
-            return str(value)
+            return value
         except ClientError as e:
             logger.error(
                     "Failed due to %s: %s",
@@ -38,8 +38,8 @@ class Visitor:
 def lambda_handler(event, context):
     dyn_resource = boto3.resource('dynamodb')
     counter = Visitor(dyn_resource)
-    response = counter.add_visitor()
+    value = counter.add_visitor()
     return {
         'statusCode': 200,
-        'body': json.dumps(response)
+        'body': value
     }
