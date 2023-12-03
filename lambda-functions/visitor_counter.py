@@ -23,8 +23,9 @@ class Visitor:
         try:
             current_value = self.table.get_item(Key={'id': 'visitor_count'})
             value = current_value['Item']['value'] + 1
-            return self.table.put_item(Item={'id': 'visitor_count',
-                                             'value': value})
+            self.table.put_item(Item={'id': 'visitor_count',
+                                            'value': value})
+            return str(value)
         except ClientError as e:
             logger.error(
                     "Failed due to %s: %s",
