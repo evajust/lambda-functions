@@ -2,7 +2,4 @@ version: 0.2
 phases:
   build:
     commands:
-      - zip visitor-counter.zip visitor-counter.py
-      - aws s3 cp visitor-counter.zip s3://org-lambda-bucket
-      - wait
-      - aws lambda update-function-code --function-name visitor_counter --s3-bucket org-lambda-bucket --s3-key visitor-counter.zip
+      - ./push_files.py
