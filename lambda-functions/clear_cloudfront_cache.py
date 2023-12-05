@@ -9,39 +9,36 @@ logger = logging.getLogger(__name__)
 
 
 def notify_success(event):
-    client = boto3.client('codepipeline')
-    client.put_job_success_result(jobId=event['CodePipeline.job']['id'])
+    client = boto3.client("codepipeline")
+    client.put_job_success_result(jobId=event["CodePipeline.job"]["id"])
 
 
 def notify_failure(event):
-    client = boto3.client('codepipeline')
-    failure_details = {
-            'type': 'ConfigurationError',
-            'message': 'URL not found'}
-    client.put_job_filure_result(jobId=event['CodePipeline.job']['id'],
-                                 failureDetails=failure_details)
+    client = boto3.client("codepipeline")
+    failure_details = {"type": "ConfigurationError", "message": "URL not found"}
+    client.put_job_filure_result(
+        jobId=event["CodePipeline.job"]["id"], failureDetails=failure_details
+    )
 
 
 def lambda_handler(event, context):
-    client = boto3.client('cloudfront')
+    client = boto3.client("cloudfront")
 
     print("event: " + str(event))
-    caller_reference = datetime.now().strftime('%Y%m%d%H%M%S%f')
-    url = event['CodePipeline.job']['data']['actionConfiguration']['configuration']['UserParameters']
-    invalidation_path = {'Paths': {
-                             'Quantity': 1,
-                             'Items': ['/*']
-                             },
-                         'CallerReference': caller_reference
-                         }
+    caller_reference = datetime.now().strftime("%Y%m%d%H%M%S%f")
+    url = event["CodePipeline.job"]["data"]["actionConfiguration"]["configuration"][
+        "UserParameters"
+    ]
+    invalidation_path = {
+        "Paths": {"Quantity": 1, "Items": ["/*"]},
+        "CallerReference": caller_reference,
+    }
 
     response = client.list_distributions()
-    distribution_list = response['DistributionList']['Items']
+    distribution_list = response["DistributionList"]["Items"]
     for distribution in distribution_list:
-        if url in distribution['Aliases']['Items']:
+        if url in distribution["Aliases"]["Items"]:
             client.create_invalidation(
-                    DistributionId=distribution['Id'],
-                    InvalidationBatch=invalidation_path)
+                DistributionId=distribution["Id"], InvalidationBatch=invalidation_path
+            )
             notify_success(event)
-
-
