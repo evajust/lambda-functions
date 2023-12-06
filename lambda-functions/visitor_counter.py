@@ -2,20 +2,21 @@
 import boto3
 import logging
 from botocore.exceptions import ClientError
+from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource
 
 
 logger = logging.getLogger(__name__)
 
 
 class Visitor:
-    def __init__(self, dyn_resource):
+    def __init__(self, dyn_resource: DynamoDBServiceResource):
         """
         :param dyn_resource: A Boto3 DynamoDB resource.
         """
         self.dyn_resource = dyn_resource
         self.table = self.dyn_resource.Table("test1")
 
-    def add_visitor(self):
+    def add_visitor(self) -> int:
         """
         Increases the visitor counter by one.
         """
@@ -34,7 +35,7 @@ class Visitor:
             print(e)
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: dict, context: dict) -> dict:
     dyn_resource = boto3.resource("dynamodb")
     counter = Visitor(dyn_resource)
     value = counter.add_visitor()
