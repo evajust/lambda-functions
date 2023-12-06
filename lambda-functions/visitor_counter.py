@@ -1,4 +1,3 @@
-"""Version 0.2"""
 import boto3
 import logging
 from botocore.exceptions import ClientError
