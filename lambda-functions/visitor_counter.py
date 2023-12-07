@@ -12,16 +12,16 @@ class Visitor:
         :param dyn_resource: A Boto3 DynamoDB resource.
         """
         self.dyn_resource = dyn_resource
-        self.table = self.dyn_resource.Table("test1")
+        self.table = self.dyn_resource.Table("portfolio_db")
 
     def add_visitor(self) -> int:
         """
         Increases the visitor counter by one.
         """
         try:
-            current_value = self.table.get_item(Key={"id": "visitor_count"})
+            current_value = self.table.get_item(Key={"id": "view_count"})
             value = current_value["Item"]["value"] + 1
-            self.table.put_item(Item={"id": "visitor_count", "value": value})
+            self.table.put_item(Item={"id": "view_count", "value": value})
             return value
         except ClientError as e:
             logger.error(
@@ -38,3 +38,5 @@ def lambda_handler(event: dict, context: dict) -> dict:
     counter = Visitor(dyn_resource)
     value = counter.add_visitor()
     return {"statusCode": 200, "body": value}
+
+lambda_handler({}, {})
