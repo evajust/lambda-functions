@@ -1,14 +1,13 @@
 import boto3
 import logging
 from botocore.exceptions import ClientError
-from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource
 
 
 logger = logging.getLogger(__name__)
 
 
 class Visitor:
-    def __init__(self, dyn_resource: DynamoDBServiceResource):
+    def __init__(self, dyn_resource):
         """
         :param dyn_resource: A Boto3 DynamoDB resource.
         """
